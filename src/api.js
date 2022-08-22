@@ -1,7 +1,9 @@
 const express = require('express');
+const serverless = require('serverless-http');
 const mongoose = require('mongoose');
 const cors = require('cors')
 const app = express();
+const router = express.Router();
 app.use(express.json());
 app.use(cors());
 
@@ -43,25 +45,21 @@ const UserSchema = mongoose.Schema({
 
 const User = mongoose.model('user', UserSchema);
 
-app.listen(3000, () => {
-    console.log("Listening on port 3000...");
-})
-
-app.get('/', (req, res) => {
+router.get('/', (req, res) => {
     res.send("You are on Anime D. Store API")
 });
 
-app.get('/users', (req, res) => {
+router.get('/users', (req, res) => {
     res.send("You are on Anime D. Store API")
 });
 
-app.get('/users/:email', (req, res) => {
+router.get('/users/:email', (req, res) => {
     User.findOne( { email: req.params.email } , (err, user) => {
         res.send(user);
     })
 });
 
-app.post('/signIn', (req, res) => {
+router.post('/signIn', (req, res) => {
 
     let newUser = new User({
         email: req.body.email,
@@ -81,8 +79,7 @@ app.post('/signIn', (req, res) => {
 
 });
 
-app.post('/addItemToUser/', (req, res) => {
-    res.header("Access-Control-Allow-Origin", "*");
+router.post('/addItemToUser/', (req, res) => {
     console.log(req.body);
     User.findOne( { email: req.body.email } , (err, user) => {
         let items = req.body.items;
@@ -106,3 +103,7 @@ app.post('/addItemToUser/', (req, res) => {
         }
     });;
 });
+
+app.use('/.netlify/functions/api', router);
+
+module.exports.handler = serverless(app);
