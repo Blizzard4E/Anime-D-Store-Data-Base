@@ -85,7 +85,7 @@ router.post('/addItemToUser/', (req, res) => {
         let items = req.body.items;
         console.log(items);
         if(user != null) {
-            
+            console.log(user);
             let updatedUser = {
                 email: req.body.email,
                 history: user.history
@@ -94,7 +94,7 @@ router.post('/addItemToUser/', (req, res) => {
                 updatedUser.history.push(item); 
             });
             console.log(updatedUser);
-            User.findOneAndUpdate( user, updatedUser , (err, user2) => {
+            User.findOneAndUpdate( { email: req.body.email }, updatedUser , (err, user2) => {
                 res.send('Updated user!');
             });
         }
