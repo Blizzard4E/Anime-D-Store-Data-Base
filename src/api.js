@@ -1,7 +1,8 @@
 const express = require('express');
 const serverless = require('serverless-http');
 const mongoose = require('mongoose');
-const cors = require('cors')
+const cors = require('cors');
+const { response } = require('express');
 const app = express();
 const router = express.Router();
 app.use(express.json());
@@ -50,12 +51,20 @@ router.get('/', (req, res) => {
 });
 
 router.get('/users', (req, res) => {
-    res.send("You are on Anime D. Store API")
+    User.find({}, (err, user) => {
+        res.send(user);
+    })
 });
 
 router.get('/users/:email', (req, res) => {
     User.findOne( { email: req.params.email } , (err, user) => {
-        res.send(user);
+        if(user != null) {
+            res.send(user);
+        }
+        else {
+            res.send("This user does not exist!");
+        }
+        
     })
 });
 
@@ -103,6 +112,10 @@ router.post('/addItemToUser/', (req, res) => {
         }
     });;
 });
+
+router.get("*", (req, res) => {
+    res.send("This api route does not exist!<br>Please use /users or /users/userEmail@gmail.com");
+})
 
 app.use('/.netlify/functions/api', router);
 
